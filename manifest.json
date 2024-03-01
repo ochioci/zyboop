@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+    "name": "LolEsports Extension",
+    "version": "1.0.0",
+
+    "permissions": [
+        "<all_urls>",
+        "webRequest",
+        "webRequestBlocking",
+        "webRequestFilterResponse",
+        "webRequestFilterResponse.serviceWorkerScript",
+        "storage"
+    ],
+
+    "background": {
+        "scripts": ["background.js"]
+    }
+}
