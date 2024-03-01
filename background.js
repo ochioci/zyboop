@@ -1,3 +1,19 @@
+d={}
+function handleMessage(request, sender, sendResponse) {
+  console.log(request);
+  
+}
+
+function sendToCtScript(v) {
+  // console.log(v)
+  for (const tab of v) {
+    browser.tabs
+      .sendMessage(tab.id, {"info": "replying!", "data": d})
+  }
+}
+
+browser.runtime.onMessage.addListener(handleMessage);
+
 function listener(details) {
     // console.log(details)
     let decoder = new TextDecoder("utf-8");
@@ -15,25 +31,33 @@ function listener(details) {
     };
     filter.onstop = (event) => {
         handleReq(gotdata)
-        // console.log(event)
-      // The extension should always call filter.close() or filter.disconnect()
-      // after creating the StreamFilter, otherwise the response is kept alive forever.
-      // If processing of the response data is finished, use close. If any remaining
-      // response data should be processed by Firefox, use disconnect.
       filter.close();
     };
     
   }
 
+  function buildOverlay(d) {
+    a = document.createElement("div");
+    a.innerText="hi";
+
+  }
+
   function handleReq (gotdata) {
-    d = {}
     try {
         d = JSON.parse(gotdata)
+        
         // console.log(d)
         if (Object.keys(d).length == 2 && Object.keys(d).includes("section")) {
             console.log(d)
+            browser.tabs.query({"active": true}).then(sendToCtScript)
+      
+            
+            // let executing = browser.tabs.executeScript(
+            //   {"code": "console.log(" + JSON.stringify(d) + ")"}
+            //   )
         }
     } catch {
+        d={}
         // console.log(gotdata)
         console.log("hid 1 non json response")
     }

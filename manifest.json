@@ -14,5 +14,11 @@
 
     "background": {
         "scripts": ["background.js"]
-    }
+    },
+
+    "content_scripts": [{
+        "matches": ["*://learn.zybooks.com/*", "*://zybooks.com/*"],
+        "js": ["overlay.js"],
+        "run_at": "document_start"
+    }]
 }
