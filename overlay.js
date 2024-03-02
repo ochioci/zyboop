@@ -1,4 +1,5 @@
 data = {}
+currentQ = 0
 hasData = false
 browser.runtime.onMessage.addListener((request) => {
     // console.log("Message from the background script:");
@@ -31,8 +32,11 @@ function init () {
 
 function handleOverlay(matches, data) {
     answerElem = document.createElement('div')
-    answerElem.style.backgroundColor = "cyan";
-    answerElem.style.position = "absolute";
+    answerElem.style.backgroundColor = "darkgrey";
+    answerElem.style.border = "5px solid lightgrey"
+    answerElem.style.borderRadius = "10px"
+    answerElem.style.padding = "10px"
+    answerElem.style.position = "fixed";
     console.log("!!!!")
     qs = []
     toDisplay = []
@@ -62,8 +66,15 @@ function handleOverlay(matches, data) {
                         if (c.correct && 'label' in c) {
                             ltxt = ''
                             for (l of c.label) {
-                                if ('text' in l) {
-                                    ltxt += l.text
+                                try {
+                                    if ('text' in l) {
+                                        ltxt += l.text + "\n"
+                                    }
+                                }
+                                catch {
+                                    ltxt = c.label
+                                    // console.log("oops")
+                                    // console.log(c.label)
                                 }
                             }
                             ans.push(ltxt)
@@ -76,15 +87,58 @@ function handleOverlay(matches, data) {
         }
     }
 
-    for (z of toDisplay) {
-        qElem = document.createElement('div')
-        qElem.innerText = z.txt
-        aElem = document.createElement('div')
-        aElem.innerText = z.ans
-        qElem.style.color = "darkgrey"
-        answerElem.appendChild(qElem)
-        answerElem.appendChild(aElem)
+    for (let i = 0; i < toDisplay.length; i++) {
+        o = ""
+        for (x of toDisplay[i].ans) {
+            o += x + "\n"
+        } 
+        toDisplay[i].ans = o;
     }
+    leftButton = document.createElement("button")
+    leftButton.innerText = "<-"
+    leftButton.id = "leftButton"
+    rightButton = document.createElement("button")
+    rightButton.id = "rightButton"
+    rightButton.innerText = "->"
+    qArea = document.createElement("div")
+    qArea.id = "qArea"
+    aArea = document.createElement("div")
+    aArea.id = "aArea"
+
+    leftButton.addEventListener("click", prevAnswer)
+    rightButton.addEventListener("click", nextAnswer)
+
+    qArea.innerText = "Q: " +toDisplay[0].txt
+    aArea.innerText = "A: " +toDisplay[0].ans
+
+    // qArea.style.fontSize = "20pt";
+    qArea.style.fontSize = "10pt";
+    qArea.style.color = "forestgreen";
+    aArea.style.fontSize = "15pt";
+    aArea.style.color = "darkred";
+    // aArea.style.fontSize = "25pt";
+
+    answerElem.appendChild(leftButton)
+    answerElem.appendChild(rightButton)
+    answerElem.appendChild(qArea)
+    answerElem.appendChild(aArea)
+    
     answerElem.style.zIndex = "1000000"
     document.body.appendChild(answerElem)
+    console.log(answerElem)
+}
+
+function prevAnswer(e) {
+    if (currentQ > 0) {
+        currentQ--
+        qArea.innerText = "Q: " + toDisplay[currentQ].txt
+        aArea.innerText = "A: " +toDisplay[currentQ].ans
+    }
+}
+function nextAnswer(e) {
+    if (currentQ < toDisplay.length -1 ) {
+        currentQ++
+        qArea.innerText = "Q: " + toDisplay[currentQ].txt
+        aArea.innerText = "A: " +toDisplay[currentQ].ans
+    }
 }
